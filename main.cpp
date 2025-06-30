@@ -35,13 +35,13 @@ typedef struct iphdr
 // ICMP header 
 // 
 typedef struct _ihdr {
-	BYTE i_type;     // Тип сообщения
-	BYTE i_code;     // Код  /* type sub code */ 
-	USHORT i_cksum;  // Контрольная сумма
+	BYTE i_type;     // РўРёРї СЃРѕРѕР±С‰РµРЅРёСЏ
+	BYTE i_code;     // РљРѕРґ  /* type sub code */ 
+	USHORT i_cksum;  // РљРѕРЅС‚СЂРѕР»СЊРЅР°СЏ СЃСѓРјРјР°
 	USHORT i_id;     // ID
-	USHORT i_seq;    // Серийный номер
-	ULONG timestamp; // Временная метка
-}IcmpHeader;         // ICMP Сообщение включает заголовок и данные
+	USHORT i_seq;    // РЎРµСЂРёР№РЅС‹Р№ РЅРѕРјРµСЂ
+	ULONG timestamp; // Р’СЂРµРјРµРЅРЅР°СЏ РјРµС‚РєР°
+}IcmpHeader;         // ICMP РЎРѕРѕР±С‰РµРЅРёРµ РІРєР»СЋС‡Р°РµС‚ Р·Р°РіРѕР»РѕРІРѕРє Рё РґР°РЅРЅС‹Рµ
 
 USHORT checkSum(USHORT *, int);
 void decodeResponse(char *, const int, struct sockaddr_in *);
@@ -58,8 +58,8 @@ int main (int argc, char **argv)
 		return 0;
 	}
 
-	char *hostname;                  // Хост-имя удаленного компьютера
-	int package_emount = 4;          // Число отсылаемых пакетов
+	char *hostname;                  // РҐРѕСЃС‚-РёРјСЏ СѓРґР°Р»РµРЅРЅРѕРіРѕ РєРѕРјРїСЊСЋС‚РµСЂР°
+	int package_emount = 4;          // Р§РёСЃР»Рѕ РѕС‚СЃС‹Р»Р°РµРјС‹С… РїР°РєРµС‚РѕРІ
 	int timeout = 1000;
 	int response_timeout = 1000;
 
@@ -105,15 +105,15 @@ int main (int argc, char **argv)
 		}
 	}
 
-	//Инициализация WinSocket
+	//РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ WinSocket
 	WSADATA WSAData;
 	if (WSAStartup(MAKEWORD(2, 1), &WSAData) != 0)
 	{
 		printf("WSAStartup failed: %d\n", GetLastError());
 	}
 
-	//Открываем сокет
-	/*Создаем "сырой" сокет для его дальнейшего заполнения*/
+	//РћС‚РєСЂС‹РІР°РµРј СЃРѕРєРµС‚
+	/*РЎРѕР·РґР°РµРј "СЃС‹СЂРѕР№" СЃРѕРєРµС‚ РґР»СЏ РµРіРѕ РґР°Р»СЊРЅРµР№С€РµРіРѕ Р·Р°РїРѕР»РЅРµРЅРёСЏ*/
 	int sockRaw = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
 
 	if (INVALID_SOCKET == sockRaw)
@@ -121,14 +121,14 @@ int main (int argc, char **argv)
 		printf("WSASocket() failed: %d\n", GetLastError());
 	}
 
-	//Устанавливаем таймаут (в милисекундах) на прием / отправку ICMP пакета
+	//РЈСЃС‚Р°РЅР°РІР»РёРІР°РµРј С‚Р°Р№РјР°СѓС‚ (РІ РјРёР»РёСЃРµРєСѓРЅРґР°С…) РЅР° РїСЂРёРµРј / РѕС‚РїСЂР°РІРєСѓ ICMP РїР°РєРµС‚Р°
 	int bread;
 	bread = setsockopt(sockRaw, SOL_SOCKET, SO_SNDTIMEO, (char*)&response_timeout, sizeof(response_timeout));
 	if (SOCKET_ERROR == bread)
 	{
 		printf("failed to set send timeout: %d\n", GetLastError());
 
-		// закрываем сокет
+		// Р·Р°РєСЂС‹РІР°РµРј СЃРѕРєРµС‚
 		closeMySocket(sockRaw);
 
 		return 0;
@@ -140,24 +140,24 @@ int main (int argc, char **argv)
 	{
 		printf("failed to set receive timeout: %d\n", GetLastError());
 
-		// закрываем сокет
+		// Р·Р°РєСЂС‹РІР°РµРј СЃРѕРєРµС‚
 		closeMySocket(sockRaw);
 
 		return 0;
 	}
 
-	//7. Подготавливаем пакет.
+	//7. РџРѕРґРіРѕС‚Р°РІР»РёРІР°РµРј РїР°РєРµС‚.
 	//***********************************************************************
 
-	//проверка существования введенного хост-имени
-	SOCKADDR_IN dest_sin;     // Данные об удаленном хосте
-	ZeroMemory(&dest_sin, sizeof(dest_sin));    // обнуляем память
+	//РїСЂРѕРІРµСЂРєР° СЃСѓС‰РµСЃС‚РІРѕРІР°РЅРёСЏ РІРІРµРґРµРЅРЅРѕРіРѕ С…РѕСЃС‚-РёРјРµРЅРё
+	SOCKADDR_IN dest_sin;     // Р”Р°РЅРЅС‹Рµ РѕР± СѓРґР°Р»РµРЅРЅРѕРј С…РѕСЃС‚Рµ
+	ZeroMemory(&dest_sin, sizeof(dest_sin));    // РѕР±РЅСѓР»СЏРµРј РїР°РјСЏС‚СЊ
 
 	if (!getAddress(hostname, &dest_sin))
 	{
 		std::cout << "host name error\n";
 
-		// закрываем сокет
+		// Р·Р°РєСЂС‹РІР°РµРј СЃРѕРєРµС‚
 		closeMySocket(sockRaw);
 
 		return 0;
@@ -172,7 +172,7 @@ int main (int argc, char **argv)
 		std::cout << "Caught bad_alloc: " << ex.what() << "\n";
 		std::cout << "for icmp_data\n";
 
-		// закрываем сокет
+		// Р·Р°РєСЂС‹РІР°РµРј СЃРѕРєРµС‚
 		closeMySocket(sockRaw);
 
 		return -1;
@@ -183,21 +183,21 @@ int main (int argc, char **argv)
 	IcmpHeader *icmp_hdr;
 
 	icmp_hdr = (IcmpHeader*)icmp_data;
-	// заполняем ICMP заголовка
-	icmp_hdr->i_type = ICMP_ECHO;                   // тип отправляемого сообщения
-	icmp_hdr->i_code = 0;                           // код отправляемого сообщения
-	icmp_hdr->i_id = (USHORT)GetCurrentProcessId(); // в id ICMP заголовка заносим номер текущего процесса
-	icmp_hdr->i_cksum = 0;                          // обнуляем тестовую сумму
-	icmp_hdr->i_seq = 0;                            // обнуляем номер ICMP сообщения
+	// Р·Р°РїРѕР»РЅСЏРµРј ICMP Р·Р°РіРѕР»РѕРІРєР°
+	icmp_hdr->i_type = ICMP_ECHO;                   // С‚РёРї РѕС‚РїСЂР°РІР»СЏРµРјРѕРіРѕ СЃРѕРѕР±С‰РµРЅРёСЏ
+	icmp_hdr->i_code = 0;                           // РєРѕРґ РѕС‚РїСЂР°РІР»СЏРµРјРѕРіРѕ СЃРѕРѕР±С‰РµРЅРёСЏ
+	icmp_hdr->i_id = (USHORT)GetCurrentProcessId(); // РІ id ICMP Р·Р°РіРѕР»РѕРІРєР° Р·Р°РЅРѕСЃРёРј РЅРѕРјРµСЂ С‚РµРєСѓС‰РµРіРѕ РїСЂРѕС†РµСЃСЃР°
+	icmp_hdr->i_cksum = 0;                          // РѕР±РЅСѓР»СЏРµРј С‚РµСЃС‚РѕРІСѓСЋ СЃСѓРјРјСѓ
+	icmp_hdr->i_seq = 0;                            // РѕР±РЅСѓР»СЏРµРј РЅРѕРјРµСЂ ICMP СЃРѕРѕР±С‰РµРЅРёСЏ
 
 	char *datapart = icmp_data + sizeof(IcmpHeader);
-	// Заполняем чем-нибудь буфер для отправки.
+	// Р—Р°РїРѕР»РЅСЏРµРј С‡РµРј-РЅРёР±СѓРґСЊ Р±СѓС„РµСЂ РґР»СЏ РѕС‚РїСЂР°РІРєРё.
 	const int DATA_SIZE = DEF_PACKET_SIZE;
 	memset(datapart, 'm', DATA_SIZE - sizeof(IcmpHeader));
 
-	//8. Выполняем ping.
+	//8. Р’С‹РїРѕР»РЅСЏРµРј ping.
 	// **********************************************************
-	char *recvbuf;                          // буфер присланных сообщений
+	char *recvbuf;                          // Р±СѓС„РµСЂ РїСЂРёСЃР»Р°РЅРЅС‹С… СЃРѕРѕР±С‰РµРЅРёР№
 	try {
 		recvbuf = (char *) ::operator new (MAX_PACKET);
 	}
@@ -205,31 +205,31 @@ int main (int argc, char **argv)
 		std::cout << "Caught bad_alloc: " << ex.what() << "\n";
 		std::cout << "for packet counter\n";
 
-		// освобождаем память
+		// РѕСЃРІРѕР±РѕР¶РґР°РµРј РїР°РјСЏС‚СЊ
 		::operator delete(icmp_data);
 
-		// закрываем сокет
+		// Р·Р°РєСЂС‹РІР°РµРј СЃРѕРєРµС‚
 		closeMySocket(sockRaw);
 
 		return -1;
 	}
 
-	SOCKADDR_IN from_sin;				// Данные о локальном хосте
+	SOCKADDR_IN from_sin;		    // Р”Р°РЅРЅС‹Рµ Рѕ Р»РѕРєР°Р»СЊРЅРѕРј С…РѕСЃС‚Рµ
 	int iRecvLen = sizeof(from_sin);
 	int bwrote;
-	USHORT seq_no = 0;                  // Счетчик пакетов
+	USHORT seq_no = 0;                  // РЎС‡РµС‚С‡РёРє РїР°РєРµС‚РѕРІ
 
-	while (seq_no < package_emount)     // отправляем n-ое количество пакетов
+	while (seq_no < package_emount)     // РѕС‚РїСЂР°РІР»СЏРµРј n-РѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РїР°РєРµС‚РѕРІ
 	{
-		// обнуляем проверочную сумму ICMP заголовка
+		// РѕР±РЅСѓР»СЏРµРј РїСЂРѕРІРµСЂРѕС‡РЅСѓСЋ СЃСѓРјРјСѓ ICMP Р·Р°РіРѕР»РѕРІРєР°
 		((IcmpHeader*)icmp_data)->i_cksum = 0;
-		// заполняем оставшиеся поля ICMP заголовка
+		// Р·Р°РїРѕР»РЅСЏРµРј РѕСЃС‚Р°РІС€РёРµСЃСЏ РїРѕР»СЏ ICMP Р·Р°РіРѕР»РѕРІРєР°
 		((IcmpHeader*)icmp_data)->timestamp = GetTickCount();
 		((IcmpHeader*)icmp_data)->i_seq = seq_no++;
-		// указываем контрольную сумму
+		// СѓРєР°Р·С‹РІР°РµРј РєРѕРЅС‚СЂРѕР»СЊРЅСѓСЋ СЃСѓРјРјСѓ
 		((IcmpHeader*)icmp_data)->i_cksum = checkSum((USHORT*)icmp_data, DATA_SIZE);
 
-		// отсылаем пакет
+		// РѕС‚СЃС‹Р»Р°РµРј РїР°РєРµС‚
 		bwrote = sendto(sockRaw, icmp_data, DATA_SIZE, 0, 
 			(struct sockaddr*)&dest_sin, sizeof(dest_sin));
 		if (SOCKET_ERROR == bwrote)
@@ -241,11 +241,11 @@ int main (int argc, char **argv)
 			}
 			fprintf(stderr, "sendto failed: %d\n", GetLastError());
 
-			// освобождаем память
+			// РѕСЃРІРѕР±РѕР¶РґР°РµРј РїР°РјСЏС‚СЊ
 			::operator delete(icmp_data);
 			::operator delete(recvbuf);
 
-			// закрываем сокет
+			// Р·Р°РєСЂС‹РІР°РµРј СЃРѕРєРµС‚
 			closeMySocket(sockRaw);
 
 			return 0;
@@ -254,7 +254,7 @@ int main (int argc, char **argv)
 		{
 			fprintf(stdout, "Wrote %d bytes\n", bwrote);
 		}
-		// принимаем пакет
+		// РїСЂРёРЅРёРјР°РµРј РїР°РєРµС‚
 		bread = recvfrom(sockRaw, recvbuf, MAX_PACKET, 0, 
 			(struct sockaddr*)&from_sin, &iRecvLen);
 		if (SOCKET_ERROR == bread)
@@ -266,31 +266,31 @@ int main (int argc, char **argv)
 			}
 			fprintf(stderr, "recvfrom failed: %d\n", GetLastError());
 
-			// освобождаем память
+			// РѕСЃРІРѕР±РѕР¶РґР°РµРј РїР°РјСЏС‚СЊ
 			::operator delete(icmp_data);
 			::operator delete(recvbuf);
 
-			// закрываем сокет
+			// Р·Р°РєСЂС‹РІР°РµРј СЃРѕРєРµС‚
 			closeMySocket(sockRaw);
 
 			return 0;
 		}
-		// разбираем полученный пакет
+		// СЂР°Р·Р±РёСЂР°РµРј РїРѕР»СѓС‡РµРЅРЅС‹Р№ РїР°РєРµС‚
 		decodeResponse(recvbuf, bread, &from_sin);
-		// Ждем...
+		// Р–РґРµРј...
 		Sleep(timeout);
-		// ...продолжаем
+		// ...РїСЂРѕРґРѕР»Р¶Р°РµРј
 	}
 
 	getMAC();
 	system("pause");
 
-	//Завершаем работу.
-	// освобождаем память
+	//Р—Р°РІРµСЂС€Р°РµРј СЂР°Р±РѕС‚Сѓ.
+	// РѕСЃРІРѕР±РѕР¶РґР°РµРј РїР°РјСЏС‚СЊ
 	::operator delete(icmp_data);
 	::operator delete(recvbuf);
 
-	// закрываем сокет
+	// Р·Р°РєСЂС‹РІР°РµРј СЃРѕРєРµС‚
 	closeMySocket(sockRaw);
 
 	std::cout << "Press ENTER to quit\n";
@@ -299,11 +299,11 @@ int main (int argc, char **argv)
 }
 
 /*
-Ответ является IP пакетом. ICMP данные находятся в его заголовке
+РћС‚РІРµС‚ СЏРІР»СЏРµС‚СЃСЏ IP РїР°РєРµС‚РѕРј. ICMP РґР°РЅРЅС‹Рµ РЅР°С…РѕРґСЏС‚СЃСЏ РІ РµРіРѕ Р·Р°РіРѕР»РѕРІРєРµ
 */
 void decodeResponse(char *buf, const int bytes, struct sockaddr_in *from)
 {
-	IpHeader *iphdr = (IpHeader *)buf;      //Полученные данные представляют собой исходную IP-дейтаграмму.
+	IpHeader *iphdr = (IpHeader *)buf;      //РџРѕР»СѓС‡РµРЅРЅС‹Рµ РґР°РЅРЅС‹Рµ РїСЂРµРґСЃС‚Р°РІР»СЏСЋС‚ СЃРѕР±РѕР№ РёСЃС…РѕРґРЅСѓСЋ IP-РґРµР№С‚Р°РіСЂР°РјРјСѓ.
 
 	const unsigned short IP_HEADER_LENGTH = iphdr->h_len * 4; // number of 32-bit words *4 = bytes 
 
@@ -336,7 +336,7 @@ void decodeResponse(char *buf, const int bytes, struct sockaddr_in *from)
 	printf(" ttl: %d\n", iphdr->ttl);
 }
 
-//Полная проверка ICMP
+//РџРѕР»РЅР°СЏ РїСЂРѕРІРµСЂРєР° ICMP
 USHORT checkSum(USHORT *buffer, int size)
 {
 	unsigned long cksum = 0;
@@ -395,7 +395,7 @@ void getMAC() {
 
 	if (GetAdaptersInfo(AdapterInfo, &dwBufLen) == NO_ERROR) {
 		std::cout << '\n';
-		// Получаем указатель на AdapterInfo
+		// РџРѕР»СѓС‡Р°РµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅР° AdapterInfo
 		PIP_ADAPTER_INFO pAdapterInfo = AdapterInfo;
 		do {
 			sprintf(mac_address, "%02X:%02X:%02X:%02X:%02X:%02X",
@@ -403,7 +403,7 @@ void getMAC() {
 				pAdapterInfo->Address[2], pAdapterInfo->Address[3],
 				pAdapterInfo->Address[4], pAdapterInfo->Address[5]);
 
-			// печатаем все адреса
+			// РїРµС‡Р°С‚Р°РµРј РІСЃРµ Р°РґСЂРµСЃР°
 			printf("Address: %s, mac: %s\n\n",
 				pAdapterInfo->IpAddressList.IpAddress.String, mac_address);
 
