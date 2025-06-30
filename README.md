@@ -3,9 +3,10 @@
 Для корретной работы следует запускать в консоли от имени Администратора.  
 
 ### Опции запуска
-ping.exe -d <destination ip>  
+```ping.exe -d <destination ip>  
 Также доступны:  
 	-c <count of packages> - количество отправляемых пакетов  
  	-d <destination ip> - узел назначения  
   	-t <timeout in ms> - таймаут между отправками  
         -rt <response_timeout> - таймаут на ответ
+```
